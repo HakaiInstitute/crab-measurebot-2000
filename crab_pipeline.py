@@ -472,7 +472,7 @@ def calibrate_scale(ruler_roi: RulerROI) -> ScaleInfo:
 
     results = []
     for axis in (0, 1):
-        r = _calibrate_along_axis(b_inv, axis)
+        r = _calibrate_banded(b_inv, axis)
         if r is not None:
             results.append((axis, r))
 
@@ -518,6 +518,8 @@ def calibrate_scale(ruler_roi: RulerROI) -> ScaleInfo:
     calib_px = float(np.linalg.norm(np.array(seg_warped[1]) - np.array(seg_warped[0])))
     calib_mm = calib_px / pixels_per_mm
 
+    winning_band = r.get("band")
+    confidence_note = r.get("confidence_note")
     return ScaleInfo(
         pixels_per_mm=pixels_per_mm,
         unit=unit,
@@ -531,6 +533,8 @@ def calibrate_scale(ruler_roi: RulerROI) -> ScaleInfo:
         calib_mm=calib_mm,
         tick_positions=[int(p) for p in peaks],
         tick_lengths=[float(_l) for _l in lengths],
+        winning_band=winning_band,
+        confidence_note=confidence_note,
     )
 
 
