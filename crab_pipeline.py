@@ -210,9 +210,9 @@ def detect_ruler(bgr_img: np.ndarray) -> RulerROI:
         _, b_inv = cv2.threshold(warped_gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
         best_axis_quality = 0.0
         for axis in (0, 1):
-            r = _calibrate_along_axis(b_inv, axis)
+            r = _calibrate_banded(b_inv, axis)
             if r is not None:
-                best_axis_quality = max(best_axis_quality, r["quality"])
+                best_axis_quality = max(best_axis_quality, float(r["quality"]))
         if best is None or best_axis_quality > best[0]:
             best = (best_axis_quality, quad, warped_gray, warped_bgr)
 
