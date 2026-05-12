@@ -395,6 +395,76 @@ def _calibrate_along_axis(b_inv: np.ndarray, axis: int):
     }
 
 
+def _calibrate_banded(b_inv: np.ndarray, axis: int):
+    """Run _calibrate_along_axis on multiple bands of b_inv; return best result.
+
+    On a dual-scale ruler (metric ticks on one edge, imperial on the other), the
+    full-patch column sum mixes both scales into one signal and produces garbage
+    period estimates. We slice b_inv into 4 overlapping bands along the axis
+    perpendicular to the ticks, plus 1 full-patch band, and pick whichever band's
+    result has the highest `quality` score. On single-scale rulers the full-patch
+    band typically wins or ties, preserving today's behavior.
+
+    Returns the chosen result dict from _calibrate_along_axis with two extra keys:
+      - band: tuple[int, int]    (start, end) on the perpendicular axis
+      - confidence_note: str|None  set when top-2 bands disagree on px/mm by >25%
+    Returns None if every band returned None.
+    """
+    perp = b_inv.shape[0] if axis == 0 else b_inv.shape[1]
+    band_width = int(0.4 * perp)
+
+    # Build candidate band slices: 4 sliding at 20% stride + 1 full-patch.
+    candidate_bands: list[tuple[int, int]] = []
+    for i in range(4):
+        start = int(i * 0.2 * perp)
+        end = start + band_width
+        if end > perp:
+            end = perp
+        if end - start >= 8:
+            candidate_bands.append((start, end))
+    candidate_bands.append((0, perp))  # full-patch always
+
+    # Deduplicate (e.g. if perp is small, the last sliding band may equal full-patch).
+    seen = set()
+    unique_bands = []
+    for b in candidate_bands:
+        if b not in seen:
+            seen.add(b)
+            unique_bands.append(b)
+
+    results: list[tuple[float, tuple[int, int], dict]] = []
+    for start, end in unique_bands:
+        if axis == 0:
+            band_slice = b_inv[start:end, :]
+        else:
+            band_slice = b_inv[:, start:end]
+        r = _calibrate_along_axis(band_slice, axis)
+        if r is None:
+            continue
+        results.append((float(r["quality"]), (start, end), r))
+
+    if not results:
+        return None
+
+    results.sort(key=lambda x: x[0], reverse=True)
+    _quality_top, band_top, r_top = results[0]
+
+    confidence_note: str | None = None
+    if len(results) >= 2:
+        _, _, r1 = results[0]
+        _, _, r2 = results[1]
+        _, mm_per_minor_1 = _decide_unit(int(r1["minors_per_major"]))
+        _, mm_per_minor_2 = _decide_unit(int(r2["minors_per_major"]))
+        pxmm1 = r1["dx_minor"] / mm_per_minor_1
+        pxmm2 = r2["dx_minor"] / mm_per_minor_2
+        if pxmm1 > 0 and abs(pxmm1 - pxmm2) / pxmm1 > 0.25:
+            confidence_note = "low confidence: top bands disagree on px/mm"
+
+    r_top["band"] = band_top
+    r_top["confidence_note"] = confidence_note
+    return r_top
+
+
 def calibrate_scale(ruler_roi: RulerROI) -> ScaleInfo:
     """Run tick-pattern calibration on both axes and pick the more confident result."""
     warped = ruler_roi.warped_gray
