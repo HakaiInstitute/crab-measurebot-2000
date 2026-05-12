@@ -34,6 +34,8 @@ class ScaleInfo:
     calib_mm: float
     tick_positions: list = field(default_factory=list)
     tick_lengths: list = field(default_factory=list)
+    winning_band: tuple | None = None        # (start, end) in perpendicular axis, or None if full-patch
+    confidence_note: str | None = None       # human-readable note when top bands disagree
 
 
 @dataclass
