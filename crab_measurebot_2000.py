@@ -102,11 +102,23 @@ def _(cp, cv2, plt, ruler_roi):
             cv2.line(warped_vis, (0, p), (warped_vis.shape[1] - 1, p), color, 1)
     p1, p2 = scale.calib_segment_warped
     cv2.line(warped_vis, p1, p2, (255, 255, 0), 3)
+
+    # Show which band the calibration came from.
+    if scale.winning_band is not None:
+        _b_start, _b_end = scale.winning_band
+        if scale.tick_axis == 0:
+            cv2.rectangle(warped_vis, (0, _b_start), (warped_vis.shape[1] - 1, _b_end - 1), (200, 200, 200), 2)
+        else:
+            cv2.rectangle(warped_vis, (_b_start, 0), (_b_end - 1, warped_vis.shape[0] - 1), (200, 200, 200), 2)
+
     ax_scale.imshow(warped_vis)
-    ax_scale.set_title(
+    _title = (
         f"{scale.unit}: {scale.minors_per_major} minors/major, "
         f"{scale.pixels_per_mm:.2f} px/mm, calib segment = {scale.calib_mm:.1f} mm"
     )
+    if scale.confidence_note:
+        _title += f"  [{scale.confidence_note}]"
+    ax_scale.set_title(_title)
     ax_scale.axis("off")
     fig_scale
     return (scale,)
