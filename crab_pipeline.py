@@ -229,6 +229,21 @@ def detect_ruler(bgr_img: np.ndarray) -> RulerROI:
 # ----------------------------------------------------------------------------
 # Stage 2: Scale calibration
 # ----------------------------------------------------------------------------
+def _decide_unit(minors_per_major: int) -> tuple[str, float]:
+    """Map a minors-per-major count to (unit_name, mm_per_minor).
+
+    10 -> metric (1 mm per minor); 8 or 16 -> imperial (1/8 or 1/16 inch per minor).
+    Falls back to metric mm when the count is outside known ranges.
+    """
+    if minors_per_major in (8, 16):
+        return "imperial", 25.4 / minors_per_major
+    if 7 <= minors_per_major <= 12 or minors_per_major == 5:
+        return "metric", 1.0
+    if 13 <= minors_per_major <= 24:
+        return "imperial", 25.4 / minors_per_major
+    return "metric", 1.0
+
+
 def _find_peaks_1d(signal: np.ndarray, min_distance: int, prominence: float):
     peaks = []
     n = len(signal)
@@ -399,21 +414,7 @@ def calibrate_scale(ruler_roi: RulerROI) -> ScaleInfo:
     dx_minor = r["dx_minor"]
     minors_per_major = r["minors_per_major"]
 
-    # Decide unit from minors-per-major. 10 -> metric (1 mm per minor),
-    # 8 or 16 -> imperial (1/8 or 1/16 inch per minor).
-    if minors_per_major in (8, 16):
-        unit = "imperial"
-        mm_per_minor = 25.4 / minors_per_major
-    elif 7 <= minors_per_major <= 12 or minors_per_major in (5,):
-        unit = "metric"
-        mm_per_minor = 1.0
-    elif 13 <= minors_per_major <= 24:
-        unit = "imperial"
-        mm_per_minor = 25.4 / minors_per_major
-    else:
-        # Fallback: assume metric mm
-        unit = "metric"
-        mm_per_minor = 1.0
+    unit, mm_per_minor = _decide_unit(minors_per_major)
 
     pixels_per_mm = dx_minor / mm_per_minor
 
