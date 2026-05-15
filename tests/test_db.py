@@ -22,8 +22,14 @@ async def test_set_scale():
 
 @pytest.mark.asyncio
 async def test_create_measurement():
-    img = await Image.create(path="/tmp/test.jpg", scale_x1=0, scale_y1=0,
-                             scale_x2=100, scale_y2=0, scale_mm=10.0)
+    img = await Image.create(
+        path="/tmp/test.jpg",
+        scale_x1=0,
+        scale_y1=0,
+        scale_x2=100,
+        scale_y2=0,
+        scale_mm=10.0,
+    )
     m = await Measurement.create(image=img, x1=10, y1=50, x2=60, y2=50, distance_mm=5.0)
     assert m.id is not None
 

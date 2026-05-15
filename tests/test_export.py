@@ -10,13 +10,27 @@ async def test_export_columns(tmp_path):
     out = tmp_path / "out.csv"
     await export_csv(out)
     reader = csv.DictReader(out.open())
-    assert reader.fieldnames == ["image_path", "measurement_id", "x1", "y1", "x2", "y2", "distance_mm"]
+    assert reader.fieldnames == [
+        "image_path",
+        "measurement_id",
+        "x1",
+        "y1",
+        "x2",
+        "y2",
+        "distance_mm",
+    ]
 
 
 @pytest.mark.asyncio
 async def test_export_values(tmp_path):
-    img = await Image.create(path="/data/photo.jpg", scale_x1=0, scale_y1=0,
-                             scale_x2=100, scale_y2=0, scale_mm=10.0)
+    img = await Image.create(
+        path="/data/photo.jpg",
+        scale_x1=0,
+        scale_y1=0,
+        scale_x2=100,
+        scale_y2=0,
+        scale_mm=10.0,
+    )
     await Measurement.create(image=img, x1=10, y1=20, x2=60, y2=20, distance_mm=5.0)
     out = tmp_path / "out.csv"
     await export_csv(out)

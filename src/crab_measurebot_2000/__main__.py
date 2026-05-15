@@ -6,7 +6,7 @@ import qasync
 from PySide6.QtWidgets import QApplication, QFileDialog
 from tortoise import Tortoise
 
-from crab_measurebot_2000.main import MainWindow
+from crab_measurebot_2000.app import MainWindow
 
 
 async def _run(app: QApplication) -> bool:
