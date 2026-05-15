@@ -25,3 +25,7 @@ crab-measurebot = "crab_measurebot_2000.__main__:run"
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 pythonpath = ["src"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

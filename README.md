@@ -17,7 +17,8 @@ measure interocular distances (IOD). All data auto-saves to a local SQLite datab
 
 ## Quick Start
 
-Head to the [Releases page](https://github.com/HakaiInstitute/crab-measurebot-2000/releases) to download the latest release for your operating system.
+Head to the [Releases page](https://github.com/HakaiInstitute/crab-measurebot-2000/releases) to download the latest
+release for your operating system.
 
 ## Workflow
 
@@ -72,10 +73,10 @@ row per measurement with columns: `image_path`, `measurement_id`, `x1`, `y1`, `x
 uv sync
 ```
 
-**Run the app:**
+**Run the app via the installed CLI command:**
 
 ```bash
-uv run crab-measurebot
+crab-measurebot
 ```
 
 ## Data
