@@ -96,7 +96,7 @@ class Image(Model):
     scale_y1 = fields.FloatField(null=True)
     scale_x2 = fields.FloatField(null=True)
     scale_y2 = fields.FloatField(null=True)
-    scale_mm = fields.FloatField(null=True)  # stored as mm; user enters cm × 10
+    scale_mm = fields.FloatField(null=True)
 
     class Meta:
         table = "images"
@@ -713,13 +713,13 @@ class MainWindow(QMainWindow):
     async def _on_scale_placed(
         self, x1: float, y1: float, x2: float, y2: float
     ) -> None:
-        value_cm, ok = QInputDialog.getDouble(
+        value_mm, ok = QInputDialog.getDouble(
             self,
             "Scale Calibration",
-            "Length of this segment (cm):",
-            1.0,
+            "Length of this segment (mm):",
+            10.0,
             0.001,
-            10000.0,
+            100000.0,
             3,
         )
         if not ok:
@@ -729,7 +729,7 @@ class MainWindow(QMainWindow):
             return
         ir.scale_x1, ir.scale_y1 = x1, y1
         ir.scale_x2, ir.scale_y2 = x2, y2
-        ir.scale_mm = value_cm * 10.0
+        ir.scale_mm = value_mm
         await ir.save()
         self._panel.update_scale(ir)
         self._canvas.update()
