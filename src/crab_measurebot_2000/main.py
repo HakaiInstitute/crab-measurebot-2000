@@ -43,6 +43,7 @@ def images_in_dir(directory: Path) -> list[Path]:
 
 from tortoise import fields
 from tortoise.models import Model
+import csv as _csv
 
 
 class Image(Model):
@@ -69,3 +70,20 @@ class Measurement(Model):
 
     class Meta:
         table = "measurements"
+
+
+async def export_csv(output_path: Path) -> None:
+    measurements = await Measurement.all().select_related("image").order_by("image__path", "id")
+    with output_path.open("w", newline="") as f:
+        writer = _csv.DictWriter(
+            f,
+            fieldnames=["image_path", "measurement_id", "x1", "y1", "x2", "y2", "distance_mm"],
+        )
+        writer.writeheader()
+        for m in measurements:
+            writer.writerow({
+                "image_path": m.image.path,
+                "measurement_id": m.id,
+                "x1": m.x1, "y1": m.y1, "x2": m.x2, "y2": m.y2,
+                "distance_mm": round(m.distance_mm, 4),
+            })
