@@ -306,10 +306,10 @@ class ImageCanvas(QWidget):
             }.get(self._state.mode, "")
             if mode_text:
                 painter.setPen(QColor("#00c864"))
-                painter.setFont(QFont("monospace", 9))
+                painter.setFont(QFont("Menlo", 9))
                 painter.drawText(QPointF(10, self.height() - 10), mode_text)
         painter.setPen(QColor("#555"))
-        painter.setFont(QFont("monospace", 9))
+        painter.setFont(QFont("Menlo", 9))
         painter.drawText(QPointF(10, 16), f"zoom: {self._state.zoom:.2f}×")
 
     def _draw_segment(
@@ -332,7 +332,7 @@ class ImageCanvas(QWidget):
         painter.drawEllipse(QPointF(sx1, sy1), 5, 5)
         painter.drawEllipse(QPointF(sx2, sy2), 5, 5)
         mx, my = (sx1 + sx2) / 2, (sy1 + sy2) / 2 - 8
-        painter.setFont(QFont("monospace", 9))
+        painter.setFont(QFont("Menlo", 9))
         fm = painter.fontMetrics()
         tw = fm.horizontalAdvance(label)
         painter.fillRect(
