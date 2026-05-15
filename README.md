@@ -15,32 +15,6 @@ measure interocular distances (IOD). All data auto-saves to a local SQLite datab
 
 ![CrabMeasureBot 2000 screenshot](resources/screenshot.png)
 
-## Quick Start
-
-Head to the [Releases page](https://github.com/HakaiInstitute/crab-measurebot-2000/releases) to download the latest
-release for your operating system.
-
-## Requirements
-
-- Python 3.13+
-- [uv](https://docs.astral.sh/uv/)
-
-## Installation
-
-```bash
-uv sync
-```
-
-## Running
-
-```bash
-uv run crab-measurebot
-```
-
-On launch, a dialog prompts you to select a directory of images. The app supports `.jpg`, `.jpeg`, `.png`, `.tif`,
-`.tiff`, and `.bmp` files. A SQLite database (`measurebot.db`) is created automatically in the chosen directory to
-persist all scale calibrations and measurements.
-
 ## Workflow
 
 ### 1. Calibrate the scale
@@ -83,6 +57,26 @@ row per measurement with columns: `image_path`, `measurement_id`, `x1`, `y1`, `x
 | Click on a line      | Delete that measurement or scale   |
 | `Del` / `Backspace`  | Delete the most recent measurement |
 | `E`                  | Export all measurements to CSV     |
+
+## Quick Start
+
+Head to the [Releases page](https://github.com/HakaiInstitute/crab-measurebot-2000/releases) to download the latest release for your operating system.
+
+## For Developers
+
+**Requirements:** Python 3.13+, [uv](https://docs.astral.sh/uv/)
+
+**Install dependencies:**
+
+```bash
+uv sync
+```
+
+**Run the app:**
+
+```bash
+uv run crab-measurebot
+```
 
 ## Data
 
