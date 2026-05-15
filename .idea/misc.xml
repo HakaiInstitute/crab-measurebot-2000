@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Black">
+    <option name="sdkName" value="uv (crab-measurebot-2000)" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="uv (crab-measurebot-2000)" project-jdk-type="Python SDK" />
+  <component name="PythonCompatibilityInspectionAdvertiser">
+    <option name="version" value="3" />
+  </component>
+  <component name="RuffConfigService">
+    <option name="globalRuffExecutablePath" value="$USER_HOME$/.local/bin/ruff" />
+    <option name="globalRuffLspExecutablePath" value="$USER_HOME$/.local/bin/ruff-lsp" />
+    <option name="runRuffOnSave" value="true" />
+    <option name="useRuffImportOptimizer" value="true" />
+    <option name="useRuffServer" value="true" />
+  </component>
+  <component name="SshConsoleOptionsProvider">
+    <option name="myEncoding" value="UTF-8" />
+    <option name="myConnectionType" value="NONE" />
+    <option name="myConnectionId" value="" />
+  </component>
+</project>
