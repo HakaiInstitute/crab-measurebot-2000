@@ -271,6 +271,8 @@ class ImageCanvas(QWidget):
                 self._rubber_end = (ix, iy)
             elif self._state.mode == "placing_scale":
                 p1 = self._state.pending_point
+                if p1 is None:
+                    return
                 self._state.pending_point = None
                 self._state.mode = "idle"
                 self._rubber_end = None
@@ -290,6 +292,8 @@ class ImageCanvas(QWidget):
                 self.setCursor(Qt.CursorShape.ClosedHandCursor)
 
         if self._state.mode == "panning":
+            assert self._state.drag_start_pan is not None
+            assert self._state.drag_start_screen is not None
             self._state.pan_x = self._state.drag_start_pan[0] + (sx - self._state.drag_start_screen[0])
             self._state.pan_y = self._state.drag_start_pan[1] + (sy - self._state.drag_start_screen[1])
             self.update()
@@ -312,6 +316,8 @@ class ImageCanvas(QWidget):
                     self._rubber_end = (ix, iy)
             elif self._state.mode == "placing_iod":
                 p1 = self._state.pending_point
+                if p1 is None:
+                    return
                 self._state.pending_point = None
                 self._state.mode = "idle"
                 self._rubber_end = None
@@ -448,8 +454,9 @@ class RightPanel(QWidget):
     def update_measurements(self, measurements: list) -> None:
         while self._meas_layout.count():
             item = self._meas_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+            w = item.widget() if item else None
+            if w:
+                w.deleteLater()
         for i, m in enumerate(measurements):
             lbl = QLabel(f"#{i+1}  {m.distance_mm:.2f} mm")
             lbl.setStyleSheet("background:#0d1f0d;border:1px solid #1a3a1a;"
@@ -527,6 +534,8 @@ class MainWindow(QMainWindow):
         if not ok:
             return
         ir = self._state.image_record
+        if ir is None:
+            return
         ir.scale_x1, ir.scale_y1 = x1, y1
         ir.scale_x2, ir.scale_y2 = x2, y2
         ir.scale_mm = value_cm * 10.0
