@@ -707,7 +707,9 @@ class MainWindow(QMainWindow):
 
     async def _load_image(self, index: int) -> None:
         path = self._images[index]
-        img_record, _ = await Image.get_or_create(path=str(path))
+        img_record, _ = await Image.get_or_create(
+            path=str(path.relative_to(self._image_dir))
+        )
         self._state.image_record = img_record
         self._state.measurements = list(
             await img_record.measurements.all().order_by("id")

@@ -6,7 +6,7 @@ from tortoise import Tortoise
 async def init_db():
     await Tortoise.init(
         db_url="sqlite://:memory:",
-        modules={"models": ["crab_measurebot_2000.main"]},
+        modules={"models": ["crab_measurebot_2000.app"]},
     )
     await Tortoise.generate_schemas()
     yield
