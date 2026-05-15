@@ -15,6 +15,10 @@ measure interocular distances (IOD). All data auto-saves to a local SQLite datab
 
 ![CrabMeasureBot 2000 screenshot](resources/screenshot.png)
 
+## Quick Start
+
+Head to the [Releases page](https://github.com/HakaiInstitute/crab-measurebot-2000/releases) to download the latest release for your operating system.
+
 ## Workflow
 
 ### 1. Calibrate the scale
@@ -57,10 +61,6 @@ row per measurement with columns: `image_path`, `measurement_id`, `x1`, `y1`, `x
 | Click on a line      | Delete that measurement or scale   |
 | `Del` / `Backspace`  | Delete the most recent measurement |
 | `E`                  | Export all measurements to CSV     |
-
-## Quick Start
-
-Head to the [Releases page](https://github.com/HakaiInstitute/crab-measurebot-2000/releases) to download the latest release for your operating system.
 
 ## For Developers
 
