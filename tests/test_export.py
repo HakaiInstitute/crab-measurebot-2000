@@ -1,6 +1,5 @@
 import csv
 import pytest
-from pathlib import Path
 from crab_measurebot_2000.main import Image, Measurement, export_csv
 
 
@@ -38,3 +37,38 @@ async def test_export_multiple_images(tmp_path):
     rows = list(csv.DictReader(out.open()))
     assert len(rows) == 2
     assert {r["image_path"] for r in rows} == {"/data/a.jpg", "/data/b.jpg"}
+
+
+@pytest.mark.asyncio
+async def test_export_empty_db(tmp_path):
+    out = tmp_path / "out.csv"
+    await export_csv(out)
+    assert out.exists()
+    rows = list(csv.DictReader(out.open()))
+    assert rows == []  # header written, no data rows
+
+
+@pytest.mark.asyncio
+async def test_export_ordering(tmp_path):
+    # img_a sorts before img_b alphabetically
+    img_a = await Image.create(path="/data/a.jpg")
+    img_b = await Image.create(path="/data/b.jpg")
+    # Create measurements in reverse image order
+    m2 = await Measurement.create(image=img_b, x1=0, y1=0, x2=20, y2=0, distance_mm=2.0)
+    m1 = await Measurement.create(image=img_a, x1=0, y1=0, x2=10, y2=0, distance_mm=1.0)
+    out = tmp_path / "out.csv"
+    await export_csv(out)
+    rows = list(csv.DictReader(out.open()))
+    # Should be ordered by image path: a.jpg first, b.jpg second
+    assert rows[0]["image_path"] == "/data/a.jpg"
+    assert rows[1]["image_path"] == "/data/b.jpg"
+
+
+@pytest.mark.asyncio
+async def test_export_distance_rounding(tmp_path):
+    img = await Image.create(path="/data/photo.jpg")
+    await Measurement.create(image=img, x1=0, y1=0, x2=10, y2=0, distance_mm=1.23456789)
+    out = tmp_path / "out.csv"
+    await export_csv(out)
+    rows = list(csv.DictReader(out.open()))
+    assert rows[0]["distance_mm"] == "1.2346"
