@@ -44,11 +44,11 @@ jobs:
         run: |
           mkdir -p icon.iconset
           for size in 16 32 64 128 256 512; do
-            sips -z $size $size resources/icon.png --out icon.iconset/icon_${size}x${size}.png
+            sips -z $size $size resources/megalopa-icon-1024.png --out icon.iconset/icon_${size}x${size}.png
             double=$((size * 2))
-            sips -z $double $double resources/icon.png --out icon.iconset/icon_${size}x${size}@2x.png
+            sips -z $double $double resources/megalopa-icon-1024.png --out icon.iconset/icon_${size}x${size}@2x.png
           done
-          sips -z 1024 1024 resources/icon.png --out icon.iconset/icon_512x512@2x.png
+          sips -z 1024 1024 resources/megalopa-icon-1024.png --out icon.iconset/icon_512x512@2x.png
           iconutil -c icns icon.iconset -o icon.icns
 
       # ── Windows: convert PNG to .ico using Pillow ──────────────────────────
@@ -58,7 +58,7 @@ jobs:
           pip install pillow
           python -c "
           from PIL import Image
-          img = Image.open('resources/icon.png').convert('RGBA')
+          img = Image.open('resources/megalopa-icon-1024.png').convert('RGBA')
           sizes = [(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)]
           img.save('icon.ico', format='ICO', sizes=sizes)
           "
@@ -73,8 +73,8 @@ jobs:
             --name CrabMeasureBot2000 \
             --icon icon.icns \
             --paths src \
-            --hidden-import aiosqlite \
-            --hidden-import tortoise \
+            --collect-all tortoise \
+            --collect-all aiosqlite \
             --hidden-import qasync \
             src/crab_measurebot_2000/__main__.py
 
@@ -91,8 +91,8 @@ jobs:
             --name CrabMeasureBot2000 `
             --icon icon.ico `
             --paths src `
-            --hidden-import aiosqlite `
-            --hidden-import tortoise `
+            --collect-all tortoise `
+            --collect-all aiosqlite `
             --hidden-import qasync `
             src/crab_measurebot_2000/__main__.py
 

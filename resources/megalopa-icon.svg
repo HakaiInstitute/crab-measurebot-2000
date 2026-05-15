@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+
+  <rect width="1024" height="1024" fill="#f7f5ef"></rect>
+
+
+  <g transform="translate(512 512) scale(1.1) translate(-512 -512)">
+
+
+    <g fill="none" stroke="#1a1612" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 770 400 C 850 410 905 460 920 540"></path>
+      <path d="M 790 480 C 880 510 935 580 935 670"></path>
+      <path d="M 780 560 C 855 600 880 690 855 770"></path>
+      <path d="M 740 630 C 790 700 790 800 740 870"></path>
+      <path d="M 254 400 C 174 410 119 460 104 540"></path>
+      <path d="M 234 480 C 144 510 89 580 89 670"></path>
+      <path d="M 244 560 C 169 600 144 690 169 770"></path>
+      <path d="M 284 630 C 234 700 234 800 284 870"></path>
+    </g>
+
+
+    <g fill="#1a1612" stroke="#1a1612" stroke-width="24" stroke-linecap="round">
+      <path d="M 432 232 C 408 196 388 156 396 116" fill="none"></path>
+      <path d="M 592 232 C 616 196 636 156 628 116" fill="none"></path>
+      <circle cx="392" cy="108" r="18"></circle>
+      <circle cx="632" cy="108" r="18"></circle>
+    </g>
+
+
+    <g fill="#1a1612">
+      <path d="M 460 700 L 564 700 L 558 770 L 466 770 Z&#xA;               M 470 770 L 554 770 L 548 838 L 476 838 Z&#xA;               M 482 838 L 542 838 L 536 900 L 488 900 Z"></path>
+    </g>
+
+    <g fill="none" stroke="#1a1612" stroke-width="10" stroke-linecap="round">
+      <path d="M 494 900 Q 488 938 470 956"></path>
+      <path d="M 530 900 Q 536 938 554 956"></path>
+      <path d="M 512 900 L 512 962"></path>
+    </g>
+
+
+    <path d="M 512 198 C 612 208 730 254 786 350 C 832 432 826 552 786 626&#xA;             C 750 690 638 720 512 720 C 386 720 274 690 238 626&#xA;             C 198 552 192 432 238 350 C 294 254 412 208 512 198 Z" fill="#1a1612"></path>
+
+
+    <circle cx="344" cy="332" r="116" fill="#f7f5ef"></circle>
+    <circle cx="680" cy="332" r="116" fill="#f7f5ef"></circle>
+    <circle cx="344" cy="332" r="62" fill="#1a1612"></circle>
+    <circle cx="680" cy="332" r="62" fill="#1a1612"></circle>
+  </g>
+</svg>
