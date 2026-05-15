@@ -261,38 +261,9 @@ class ImageCanvas(QWidget):
 
     def mousePressEvent(self, event):
         sx, sy = event.position().x(), event.position().y()
-        ix, iy = screen_to_image(sx, sy, self._state.zoom, self._state.pan_x, self._state.pan_y)
-
         if event.button() == Qt.MouseButton.LeftButton:
-            if self._state.mode == "placing_scale":
-                self._state.pending_point = None
-                self._state.mode = "idle"
-                self._rubber_end = None
-                self.update()
-                return
             self._state.drag_start_screen = (sx, sy)
             self._state.drag_start_pan = (self._state.pan_x, self._state.pan_y)
-
-        elif event.button() == Qt.MouseButton.RightButton:
-            if self._state.mode == "placing_iod":
-                self._state.pending_point = None
-                self._state.mode = "idle"
-                self._rubber_end = None
-                self.update()
-                return
-            if self._state.mode == "idle":
-                self._state.mode = "placing_scale"
-                self._state.pending_point = (ix, iy)
-                self._rubber_end = (ix, iy)
-            elif self._state.mode == "placing_scale":
-                p1 = self._state.pending_point
-                if p1 is None:
-                    return
-                self._state.pending_point = None
-                self._state.mode = "idle"
-                self._rubber_end = None
-                self.scale_segment_placed.emit(p1[0], p1[1], ix, iy)
-            self.update()
 
     def mouseMoveEvent(self, event):
         sx, sy = event.position().x(), event.position().y()
@@ -329,21 +300,42 @@ class ImageCanvas(QWidget):
                 self._state.mode = self._pre_pan_mode
                 self._pre_pan_mode = "idle"
                 self.setCursor(Qt.CursorShape.CrossCursor)
-            elif self._state.mode == "idle" and self._state.drag_start_screen is not None:
+            elif self._state.mode == "placing_scale":
+                self._state.pending_point = None
+                self._state.mode = "idle"
+                self._rubber_end = None
+            elif self._state.mode == "idle":
                 if not self._try_delete_at(ix, iy):
                     self._state.mode = "placing_iod"
                     self._state.pending_point = (ix, iy)
                     self._rubber_end = (ix, iy)
             elif self._state.mode == "placing_iod":
                 p1 = self._state.pending_point
-                if p1 is None:
-                    return
+                if p1 is not None:
+                    self._state.pending_point = None
+                    self._state.mode = "idle"
+                    self._rubber_end = None
+                    self.iod_segment_placed.emit(p1[0], p1[1], ix, iy)
+            self._state.drag_start_screen = None
+            self._state.drag_start_pan = None
+            self.update()
+
+        elif event.button() == Qt.MouseButton.RightButton:
+            if self._state.mode == "placing_iod":
                 self._state.pending_point = None
                 self._state.mode = "idle"
                 self._rubber_end = None
-                self.iod_segment_placed.emit(p1[0], p1[1], ix, iy)
-            self._state.drag_start_screen = None
-            self._state.drag_start_pan = None
+            elif self._state.mode == "idle":
+                self._state.mode = "placing_scale"
+                self._state.pending_point = (ix, iy)
+                self._rubber_end = (ix, iy)
+            elif self._state.mode == "placing_scale":
+                p1 = self._state.pending_point
+                if p1 is not None:
+                    self._state.pending_point = None
+                    self._state.mode = "idle"
+                    self._rubber_end = None
+                    self.scale_segment_placed.emit(p1[0], p1[1], ix, iy)
             self.update()
 
     def _try_delete_at(self, ix: float, iy: float) -> bool:
