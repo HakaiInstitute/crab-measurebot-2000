@@ -1,0 +1,26 @@
+[project]
+name = "crab-measurebot-2000"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "opencv-python>=4.10",
+    "numpy>=2.0",
+    "matplotlib>=3.9",
+    "pyside6>=6.7",
+    "tortoise-orm>=0.21",
+    "qasync>=0.27",
+]
+
+[project.optional-dependencies]
+dev = [
+    "marimo>=0.23.6",
+    "ruff>=0.15.12",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+]
+
+[project.scripts]
+crab-measurebot = "crab_measurebot_2000.__main__:run"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
