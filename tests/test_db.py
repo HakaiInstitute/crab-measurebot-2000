@@ -1,4 +1,6 @@
 import pytest
+from pathlib import Path
+
 from crab_measurebot_2000.app import Image, Measurement
 
 
@@ -60,7 +62,7 @@ async def test_image_path_is_stored_relative(tmp_path):
     img, created = await Image.get_or_create(path=rel_path)
     assert created
     assert img.path == "photo.jpg"
-    assert not (tmp_path / img.path).is_absolute() or img.path == "photo.jpg"
+    assert not Path(img.path).is_absolute()
 
     # Same relative path lookup finds the same record
     img2, created2 = await Image.get_or_create(path=rel_path)
