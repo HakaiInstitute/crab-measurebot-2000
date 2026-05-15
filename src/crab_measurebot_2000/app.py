@@ -739,7 +739,13 @@ class MainWindow(QMainWindow):
         ir.scale_x2, ir.scale_y2 = x2, y2
         ir.scale_mm = value_mm
         await ir.save()
+        for m in self._state.measurements:
+            m.distance_mm = compute_distance_mm(
+                m.x1, m.y1, m.x2, m.y2, x1, y1, x2, y2, value_mm
+            )
+            await m.save()
         self._panel.update_scale(ir)
+        self._panel.update_measurements(self._state.measurements)
         self._canvas.update()
 
     @qasync.asyncSlot(float, float, float, float)
