@@ -158,7 +158,7 @@ class ImageCanvas(QWidget):
             return
         pw, ph = self._pixmap.width(), self._pixmap.height()
         ww, wh = self.width() or 1, self.height() or 1
-        self._state.zoom = min(ww / pw, wh / ph)
+        self._state.zoom = max(0.001, min(ww / pw, wh / ph))
         self._state.pan_x = (ww - pw * self._state.zoom) / 2
         self._state.pan_y = (wh - ph * self._state.zoom) / 2
 
@@ -304,11 +304,13 @@ class ImageCanvas(QWidget):
                 self.setCursor(Qt.CursorShape.ClosedHandCursor)
 
         if self._state.mode == "panning":
-            assert self._state.drag_start_pan is not None
-            assert self._state.drag_start_screen is not None
-            self._state.pan_x = self._state.drag_start_pan[0] + (sx - self._state.drag_start_screen[0])
-            self._state.pan_y = self._state.drag_start_pan[1] + (sy - self._state.drag_start_screen[1])
-            self.update()
+            if self._state.drag_start_pan is None or self._state.drag_start_screen is None:
+                self._state.mode = "idle"
+                self.setCursor(Qt.CursorShape.CrossCursor)
+            else:
+                self._state.pan_x = self._state.drag_start_pan[0] + (sx - self._state.drag_start_screen[0])
+                self._state.pan_y = self._state.drag_start_pan[1] + (sy - self._state.drag_start_screen[1])
+                self.update()
         elif self._state.mode in ("placing_iod", "placing_scale"):
             self._rubber_end = (ix, iy)
             self.update()
@@ -321,7 +323,7 @@ class ImageCanvas(QWidget):
             if self._state.mode == "panning":
                 self._state.mode = "idle"
                 self.setCursor(Qt.CursorShape.CrossCursor)
-            elif self._state.mode == "idle":
+            elif self._state.mode == "idle" and self._state.drag_start_screen is not None:
                 if not self._try_delete_at(ix, iy):
                     self._state.mode = "placing_iod"
                     self._state.pending_point = (ix, iy)
@@ -514,8 +516,9 @@ class MainWindow(QMainWindow):
         self._canvas.measurement_deleted.connect(self._on_measurement_deleted)
         self._panel.export_requested.connect(lambda: asyncio.ensure_future(self._on_export()))
 
+        self._load_task: asyncio.Task | None = None
         if self._images:
-            asyncio.ensure_future(self._load_image(0))
+            self._load_task = asyncio.ensure_future(self._load_image(0))
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -534,8 +537,10 @@ class MainWindow(QMainWindow):
     def _navigate(self, delta: int) -> None:
         if not self._images:
             return
+        if self._load_task and not self._load_task.done():
+            self._load_task.cancel()
         self._state.image_index = (self._state.image_index + delta) % len(self._images)
-        asyncio.ensure_future(self._load_image(self._state.image_index))
+        self._load_task = asyncio.ensure_future(self._load_image(self._state.image_index))
 
     async def _load_image(self, index: int) -> None:
         path = self._images[index]

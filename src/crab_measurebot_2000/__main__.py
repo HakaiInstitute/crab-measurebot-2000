@@ -32,6 +32,7 @@ def run() -> None:
     with loop:
         loop.run_until_complete(_run(app))
         loop.run_forever()
+        loop.run_until_complete(Tortoise.close_connections())
 
 
 if __name__ == "__main__":
