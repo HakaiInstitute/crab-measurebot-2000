@@ -467,6 +467,7 @@ class RightPanel(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFixedWidth(200)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet("background:#111;color:#ccc;")
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -509,6 +510,7 @@ class RightPanel(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet("border:none;background:transparent;")
+        scroll.viewport().setStyleSheet("background:transparent;")
         scroll.setMaximumHeight(200)
         scroll.setWidget(meas_container)
         layout.addWidget(
@@ -542,7 +544,7 @@ class RightPanel(QWidget):
             row.addStretch()
             ctrl_rows.append(row)
         ctrl_frame = QFrame()
-        ctrl_frame.setStyleSheet("border-bottom:1px solid #222;")
+        ctrl_frame.setStyleSheet("background:#111;border-bottom:1px solid #222;")
         cl = QVBoxLayout(ctrl_frame)
         cl.setContentsMargins(12, 10, 12, 10)
         cl.addWidget(self._header("CONTROLS"))
@@ -562,7 +564,7 @@ class RightPanel(QWidget):
 
     def _section(self, widgets: list) -> QFrame:
         frame = QFrame()
-        frame.setStyleSheet("border-bottom:1px solid #222;")
+        frame.setStyleSheet("background:#111;border-bottom:1px solid #222;")
         vl = QVBoxLayout(frame)
         vl.setContentsMargins(12, 10, 12, 10)
         for w in widgets:
