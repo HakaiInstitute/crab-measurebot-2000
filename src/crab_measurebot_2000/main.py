@@ -136,8 +136,10 @@ class ImageCanvas(QWidget):
         self._state = state
         self._pixmap: QPixmap | None = None
         self._rubber_end: tuple[float, float] | None = None
+        self._pre_pan_mode: Literal["idle", "placing_iod"] = "idle"
         self.setMouseTracking(True)
         self.setCursor(Qt.CursorShape.CrossCursor)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def load_image(self, path: Path) -> None:
         bgr = cv2.imread(str(path))
@@ -295,17 +297,19 @@ class ImageCanvas(QWidget):
         sx, sy = event.position().x(), event.position().y()
         ix, iy = screen_to_image(sx, sy, self._state.zoom, self._state.pan_x, self._state.pan_y)
 
-        if (self._state.mode == "idle" and self._state.drag_start_screen
+        if (self._state.mode in ("idle", "placing_iod") and self._state.drag_start_screen
                 and event.buttons() & Qt.MouseButton.LeftButton):
             dx = sx - self._state.drag_start_screen[0]
             dy = sy - self._state.drag_start_screen[1]
             if math.hypot(dx, dy) >= 5:
+                self._pre_pan_mode = "placing_iod" if self._state.mode == "placing_iod" else "idle"
                 self._state.mode = "panning"
                 self.setCursor(Qt.CursorShape.ClosedHandCursor)
 
         if self._state.mode == "panning":
             if self._state.drag_start_pan is None or self._state.drag_start_screen is None:
-                self._state.mode = "idle"
+                self._state.mode = self._pre_pan_mode
+                self._pre_pan_mode = "idle"
                 self.setCursor(Qt.CursorShape.CrossCursor)
             else:
                 self._state.pan_x = self._state.drag_start_pan[0] + (sx - self._state.drag_start_screen[0])
@@ -321,7 +325,8 @@ class ImageCanvas(QWidget):
 
         if event.button() == Qt.MouseButton.LeftButton:
             if self._state.mode == "panning":
-                self._state.mode = "idle"
+                self._state.mode = self._pre_pan_mode
+                self._pre_pan_mode = "idle"
                 self.setCursor(Qt.CursorShape.CrossCursor)
             elif self._state.mode == "idle" and self._state.drag_start_screen is not None:
                 if not self._try_delete_at(ix, iy):
@@ -464,6 +469,12 @@ class RightPanel(QWidget):
         self._progress_bar.setMaximum(total)
         self._progress_bar.setValue(index + 1)
 
+    def flash_scale_warning(self) -> None:
+        self._scale_status.setText("⚠ Set scale first!")
+        self._scale_status.setStyleSheet("color:#ff6644;font-size:10px;font-weight:bold;")
+        from PySide6.QtCore import QTimer
+        QTimer.singleShot(2000, lambda: self.update_scale(None))
+
     def update_scale(self, image_record) -> None:
         if image_record and image_record.scale_mm is not None:
             scale_px = math.hypot(image_record.scale_x2 - image_record.scale_x1,
@@ -573,6 +584,7 @@ class MainWindow(QMainWindow):
     async def _on_iod_placed(self, x1: float, y1: float, x2: float, y2: float) -> None:
         ir = self._state.image_record
         if ir is None or ir.scale_mm is None:
+            self._panel.flash_scale_warning()
             return
         dist_mm = compute_distance_mm(x1, y1, x2, y2,
                                       ir.scale_x1, ir.scale_y1, ir.scale_x2, ir.scale_y2,
