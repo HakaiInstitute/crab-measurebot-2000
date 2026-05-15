@@ -23,6 +23,8 @@ def compute_distance_mm(
     scale_mm: float,
 ) -> float:
     scale_px = math.hypot(s_x2 - s_x1, s_y2 - s_y1)
+    if scale_px == 0.0:
+        raise ValueError("Scale segment has zero length")
     meas_px = math.hypot(m_x2 - m_x1, m_y2 - m_y1)
     return meas_px * scale_mm / scale_px
 

@@ -29,6 +29,10 @@ def test_compute_distance_mm_diagonal():
     )
     assert result == pytest.approx(5.0)
 
+def test_compute_distance_mm_zero_scale_raises():
+    with pytest.raises(ValueError):
+        compute_distance_mm(0, 0, 50, 0, 5, 5, 5, 5, 10.0)
+
 def test_screen_to_image_identity():
     assert screen_to_image(100.0, 50.0, 1.0, 0.0, 0.0) == (pytest.approx(100.0), pytest.approx(50.0))
 
@@ -48,4 +52,4 @@ def test_images_in_dir(tmp_path):
     (tmp_path / "c.png").touch()
     (tmp_path / "d.txt").touch()
     result = images_in_dir(tmp_path)
-    assert sorted(p.name for p in result) == ["a.jpg", "b.JPEG", "c.png"]
+    assert [p.name for p in result] == ["a.jpg", "b.JPEG", "c.png"]
