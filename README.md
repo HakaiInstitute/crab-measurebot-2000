@@ -1,14 +1,24 @@
+<div align="center">
+  <img src="resources/megalopa-icon-180.png" width="90" alt="CrabMeasureBot 2000">
+
 # CrabMeasureBot 2000
 
-![CrabMeasureBot 2000](resources/megalopa-icon-180.png)
+Manual interocular distance measurement for crab larvae photos
 
-## Screenshots
+[![Release](https://img.shields.io/github/v/release/HakaiInstitute/crab-measurebot-2000)](https://github.com/HakaiInstitute/crab-measurebot-2000/releases)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey)](#)
+[![Python](https://img.shields.io/badge/python-3.13%2B-blue)](https://www.python.org/)
+</div>
+
+Open a directory of crab larvae images, calibrate a pixel-to-mm scale from a ruler visible in each photo, then click to
+measure interocular distances (IOD). All data auto-saves to a local SQLite database and exports to CSV.
 
 ![CrabMeasureBot 2000 screenshot](resources/screenshot.png)
 
-A desktop GUI for manually measuring interocular distances (IOD) from crab larvae photos. Open a directory of images,
-calibrate a scale reference from a ruler visible in each photo, then draw measurement segments between eye points. All
-data persists automatically to a local SQLite database and can be exported to CSV.
+## Quick Start
+
+Head to the [Releases page](https://github.com/HakaiInstitute/crab-measurebot-2000/releases) to download the latest
+release for your operating system.
 
 ## Requirements
 
