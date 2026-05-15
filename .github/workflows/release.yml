@@ -15,13 +15,9 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            platform: windows
             artifact_name: CrabMeasureBot2000-windows.exe
-            exe_path: dist/CrabMeasureBot2000.exe
           - os: macos-latest
-            platform: macos
-            artifact_name: CrabMeasureBot2000-macos
-            exe_path: dist/CrabMeasureBot2000
+            artifact_name: CrabMeasureBot2000-macos.zip
 
     runs-on: ${{ matrix.os }}
 
@@ -67,11 +63,12 @@ jobs:
           img.save('icon.ico', format='ICO', sizes=sizes)
           "
 
+      # macOS uses --onedir so the .app bundle stays intact, then gets zipped
       - name: Build with PyInstaller (macOS)
         if: runner.os == 'macOS'
         run: |
           uv run pyinstaller \
-            --onefile \
+            --onedir \
             --windowed \
             --name CrabMeasureBot2000 \
             --icon icon.icns \
@@ -80,6 +77,10 @@ jobs:
             --hidden-import tortoise \
             --hidden-import qasync \
             src/crab_measurebot_2000/__main__.py
+
+      - name: Zip .app bundle (macOS)
+        if: runner.os == 'macOS'
+        run: ditto -c -k --sequesterRsrc --keepParent dist/CrabMeasureBot2000.app CrabMeasureBot2000-macos.zip
 
       - name: Build with PyInstaller (Windows)
         if: runner.os == 'Windows'
@@ -95,12 +96,12 @@ jobs:
             --hidden-import qasync `
             src/crab_measurebot_2000/__main__.py
 
-      - name: Rename artifact
+      - name: Copy Windows executable
+        if: runner.os == 'Windows'
         shell: bash
         env:
-          EXE_PATH: ${{ matrix.exe_path }}
           ARTIFACT_NAME: ${{ matrix.artifact_name }}
-        run: cp "$EXE_PATH" "$ARTIFACT_NAME"
+        run: cp dist/CrabMeasureBot2000.exe "$ARTIFACT_NAME"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
