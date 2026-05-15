@@ -1,5 +1,5 @@
 import pytest
-from crab_measurebot_2000.main import Image, Measurement
+from crab_measurebot_2000.app import Image, Measurement
 
 
 @pytest.mark.asyncio

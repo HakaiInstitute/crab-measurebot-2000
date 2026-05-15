@@ -1,6 +1,6 @@
 import math
 import pytest
-from crab_measurebot_2000.main import (
+from crab_measurebot_2000.app import (
     distance_point_to_segment,
     compute_distance_mm,
     images_in_dir,
