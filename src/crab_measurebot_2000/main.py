@@ -14,7 +14,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import (
     QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel,
-    QMainWindow, QPushButton, QScrollArea, QVBoxLayout, QWidget,
+    QMainWindow, QProgressBar, QPushButton, QScrollArea, QVBoxLayout, QWidget,
 )
 from tortoise import fields
 from tortoise.models import Model
@@ -261,10 +261,22 @@ class ImageCanvas(QWidget):
         ix, iy = screen_to_image(sx, sy, self._state.zoom, self._state.pan_x, self._state.pan_y)
 
         if event.button() == Qt.MouseButton.LeftButton:
+            if self._state.mode == "placing_scale":
+                self._state.pending_point = None
+                self._state.mode = "idle"
+                self._rubber_end = None
+                self.update()
+                return
             self._state.drag_start_screen = (sx, sy)
             self._state.drag_start_pan = (self._state.pan_x, self._state.pan_y)
 
         elif event.button() == Qt.MouseButton.RightButton:
+            if self._state.mode == "placing_iod":
+                self._state.pending_point = None
+                self._state.mode = "idle"
+                self._rubber_end = None
+                self.update()
+                return
             if self._state.mode == "idle":
                 self._state.mode = "placing_scale"
                 self._state.pending_point = (ix, iy)
@@ -361,7 +373,14 @@ class RightPanel(QWidget):
         self._file_label.setWordWrap(True)
         self._counter_label = QLabel("")
         self._counter_label.setStyleSheet("color:#666;font-size:10px;")
-        layout.addWidget(self._section([self._file_label, self._counter_label]))
+        self._progress_bar = QProgressBar()
+        self._progress_bar.setTextVisible(False)
+        self._progress_bar.setFixedHeight(3)
+        self._progress_bar.setStyleSheet(
+            "QProgressBar{background:#333;border-radius:1px;}"
+            "QProgressBar::chunk{background:#4466aa;border-radius:1px;}"
+        )
+        layout.addWidget(self._section([self._file_label, self._counter_label, self._progress_bar]))
 
         self._scale_status = QLabel("Not set")
         self._scale_status.setStyleSheet("color:#666;font-size:10px;")
@@ -385,7 +404,7 @@ class RightPanel(QWidget):
         layout.addWidget(self._section([
             self._header("MEASUREMENTS"),
             scroll,
-            self._hint("Left-click × 2 to add\nClick line to delete"),
+            self._hint("Left-click × 2 to add · click line to delete"),
         ]))
 
         controls = [("← →","navigate"),("scroll","zoom"),("L-drag","pan"),
@@ -440,6 +459,8 @@ class RightPanel(QWidget):
     def update_file_info(self, filename: str, index: int, total: int) -> None:
         self._file_label.setText(filename)
         self._counter_label.setText(f"Image {index + 1} of {total}")
+        self._progress_bar.setMaximum(total)
+        self._progress_bar.setValue(index + 1)
 
     def update_scale(self, image_record) -> None:
         if image_record and image_record.scale_mm is not None:
