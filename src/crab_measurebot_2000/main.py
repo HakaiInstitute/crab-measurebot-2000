@@ -39,3 +39,33 @@ def image_to_screen(ix: float, iy: float, zoom: float, pan_x: float, pan_y: floa
 
 def images_in_dir(directory: Path) -> list[Path]:
     return sorted(p for p in directory.iterdir() if p.suffix.lower() in IMAGE_EXTENSIONS)
+
+
+from tortoise import fields
+from tortoise.models import Model
+
+
+class Image(Model):
+    id = fields.IntField(primary_key=True)
+    path = fields.CharField(max_length=1024, unique=True)
+    scale_x1 = fields.FloatField(null=True)
+    scale_y1 = fields.FloatField(null=True)
+    scale_x2 = fields.FloatField(null=True)
+    scale_y2 = fields.FloatField(null=True)
+    scale_mm = fields.FloatField(null=True)  # stored as mm; user enters cm × 10
+
+    class Meta:
+        table = "images"
+
+
+class Measurement(Model):
+    id = fields.IntField(primary_key=True)
+    image = fields.ForeignKeyField("models.Image", related_name="measurements")
+    x1 = fields.FloatField()
+    y1 = fields.FloatField()
+    x2 = fields.FloatField()
+    y2 = fields.FloatField()
+    distance_mm = fields.FloatField()
+
+    class Meta:
+        table = "measurements"
