@@ -12,6 +12,7 @@ from PySide6.QtCore import Qt, QPointF, QRectF, Signal, QEvent
 from PySide6.QtGui import (
     QPainter, QPixmap, QImage, QColor, QPen, QFont,
 )
+from PySide6.QtGui import QShortcut, QKeySequence
 from PySide6.QtWidgets import (
     QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel,
     QMainWindow, QProgressBar, QPushButton, QScrollArea, QVBoxLayout, QWidget,
@@ -531,19 +532,17 @@ class MainWindow(QMainWindow):
         if self._images:
             self._load_task = asyncio.ensure_future(self._load_image(0))
 
-    def keyPressEvent(self, event):
-        key = event.key()
-        if key == Qt.Key.Key_Right:
-            self._navigate(1)
-        elif key == Qt.Key.Key_Left:
-            self._navigate(-1)
-        elif key == Qt.Key.Key_E:
-            asyncio.ensure_future(self._on_export())
-        elif key in (Qt.Key.Key_Delete, Qt.Key.Key_Backspace):
-            if self._state.measurements:
-                asyncio.ensure_future(self._do_delete_measurement(self._state.measurements[-1].id))
-        else:
-            super().keyPressEvent(event)
+        ctx = Qt.ShortcutContext.ApplicationShortcut
+        QShortcut(QKeySequence(Qt.Key.Key_Right), self, context=ctx).activated.connect(lambda: self._navigate(1))
+        QShortcut(QKeySequence(Qt.Key.Key_Left), self, context=ctx).activated.connect(lambda: self._navigate(-1))
+        QShortcut(QKeySequence("E"), self, context=ctx).activated.connect(
+            lambda: asyncio.ensure_future(self._on_export()))
+        QShortcut(QKeySequence(Qt.Key.Key_Delete), self, context=ctx).activated.connect(self._delete_last)
+        QShortcut(QKeySequence(Qt.Key.Key_Backspace), self, context=ctx).activated.connect(self._delete_last)
+
+    def _delete_last(self) -> None:
+        if self._state.measurements:
+            asyncio.ensure_future(self._do_delete_measurement(self._state.measurements[-1].id))
 
     def _navigate(self, delta: int) -> None:
         if not self._images:
