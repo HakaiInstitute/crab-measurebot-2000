@@ -54,8 +54,8 @@ async def test_export_ordering(tmp_path):
     img_a = await Image.create(path="/data/a.jpg")
     img_b = await Image.create(path="/data/b.jpg")
     # Create measurements in reverse image order
-    m2 = await Measurement.create(image=img_b, x1=0, y1=0, x2=20, y2=0, distance_mm=2.0)
-    m1 = await Measurement.create(image=img_a, x1=0, y1=0, x2=10, y2=0, distance_mm=1.0)
+    await Measurement.create(image=img_b, x1=0, y1=0, x2=20, y2=0, distance_mm=2.0)
+    await Measurement.create(image=img_a, x1=0, y1=0, x2=10, y2=0, distance_mm=1.0)
     out = tmp_path / "out.csv"
     await export_csv(out)
     rows = list(csv.DictReader(out.open()))
