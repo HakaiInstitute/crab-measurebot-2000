@@ -80,7 +80,6 @@ async def _run(app: QApplication) -> bool:
     )
     await Tortoise.generate_schemas()
     window = MainWindow(image_dir)
-    window.destroyed.connect(app.quit)
     window.show()
     return True
 

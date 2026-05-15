@@ -19,6 +19,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtGui import QShortcut, QKeySequence
 from PySide6.QtWidgets import (
+    QApplication,
     QFileDialog,
     QFrame,
     QHBoxLayout,
@@ -665,6 +666,11 @@ class MainWindow(QMainWindow):
         self._load_task: asyncio.Task | None = None
         if self._images:
             self._load_task = asyncio.ensure_future(self._load_image(0))
+
+    def closeEvent(self, event):
+        if app := QApplication.instance():
+            app.quit()
+        super().closeEvent(event)
 
         ctx = Qt.ShortcutContext.ApplicationShortcut
         QShortcut(QKeySequence(Qt.Key.Key_Right), self, context=ctx).activated.connect(
