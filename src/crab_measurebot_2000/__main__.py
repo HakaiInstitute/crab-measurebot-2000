@@ -18,6 +18,7 @@ async def _run(app: QApplication) -> bool:
     await Tortoise.init(
         db_url=f"sqlite://{db_path}",
         modules={"models": ["crab_measurebot_2000.main"]},
+        _enable_global_fallback=True,
     )
     await Tortoise.generate_schemas()
     window = MainWindow(image_dir)
