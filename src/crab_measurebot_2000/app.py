@@ -663,15 +663,6 @@ class MainWindow(QMainWindow):
             lambda: asyncio.ensure_future(self._on_export())
         )
 
-        self._load_task: asyncio.Task | None = None
-        if self._images:
-            self._load_task = asyncio.ensure_future(self._load_image(0))
-
-    def closeEvent(self, event):
-        if app := QApplication.instance():
-            app.quit()
-        super().closeEvent(event)
-
         ctx = Qt.ShortcutContext.ApplicationShortcut
         QShortcut(QKeySequence(Qt.Key.Key_Right), self, context=ctx).activated.connect(
             lambda: self._navigate(1)
@@ -688,6 +679,15 @@ class MainWindow(QMainWindow):
         QShortcut(
             QKeySequence(Qt.Key.Key_Backspace), self, context=ctx
         ).activated.connect(self._delete_last)
+
+        self._load_task: asyncio.Task | None = None
+        if self._images:
+            self._load_task = asyncio.ensure_future(self._load_image(0))
+
+    def closeEvent(self, event):
+        if app := QApplication.instance():
+            app.quit()
+        super().closeEvent(event)
 
     def _delete_last(self) -> None:
         if self._state.measurements:
