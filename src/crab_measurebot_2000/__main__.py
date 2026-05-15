@@ -54,7 +54,9 @@ class WelcomeDialog(QDialog):
         self.setStyleSheet("background:#111;")
 
     def _pick_directory(self):
-        path = QFileDialog.getExistingDirectory(self, "Open Image Directory")
+        path = QFileDialog.getExistingDirectory(
+            self, "Open Image Directory", str(Path.home())
+        )
         if path:
             self._selected_dir = Path(path)
             self.accept()
