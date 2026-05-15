@@ -3,25 +3,82 @@ import sys
 from pathlib import Path
 
 import qasync
-from PySide6.QtWidgets import QApplication, QFileDialog
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
+    QApplication,
+    QDialog,
+    QFileDialog,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+)
 from tortoise import Tortoise
 
 from crab_measurebot_2000.app import MainWindow
 
 
+class WelcomeDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("CrabMeasureBot 2000")
+        self.setMinimumWidth(440)
+        self._selected_dir: Path | None = None
+
+        layout = QVBoxLayout(self)
+        layout.setSpacing(16)
+        layout.setContentsMargins(32, 32, 32, 32)
+
+        title = QLabel("CrabMeasureBot 2000")
+        title.setStyleSheet("font-size:20px;font-weight:bold;color:#fff;")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        desc = QLabel(
+            "Open a folder containing images to start measuring.\n"
+            "Measurements are saved automatically in the folder."
+        )
+        desc.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        desc.setWordWrap(True)
+        desc.setStyleSheet("color:#aaa;font-size:12px;")
+
+        btn = QPushButton("Open Image Directory…")
+        btn.setStyleSheet(
+            "background:#1a2a1a;border:1px solid #2a4a2a;color:#00c864;"
+            "font-size:12px;padding:10px 20px;border-radius:4px;"
+        )
+        btn.clicked.connect(self._pick_directory)
+
+        layout.addWidget(title)
+        layout.addWidget(desc)
+        layout.addWidget(btn)
+
+        self.setStyleSheet("background:#111;")
+
+    def _pick_directory(self):
+        path = QFileDialog.getExistingDirectory(self, "Open Image Directory")
+        if path:
+            self._selected_dir = Path(path)
+            self.accept()
+
+    @property
+    def selected_dir(self) -> Path | None:
+        return self._selected_dir
+
+
 async def _run(app: QApplication) -> bool:
-    image_dir = QFileDialog.getExistingDirectory(None, "Open Image Directory")
-    if not image_dir:
+    dialog = WelcomeDialog()
+    if dialog.exec() != QDialog.DialogCode.Accepted:
         return False
-    image_dir = Path(image_dir)
+    image_dir = dialog.selected_dir
+    assert image_dir is not None
     db_path = image_dir / "measurebot.db"
     await Tortoise.init(
         db_url=f"sqlite://{db_path}",
-        modules={"models": ["crab_measurebot_2000.main"]},
+        modules={"models": ["crab_measurebot_2000.app"]},
         _enable_global_fallback=True,
     )
     await Tortoise.generate_schemas()
     window = MainWindow(image_dir)
+    window.destroyed.connect(app.quit)
     window.show()
     return True
 
