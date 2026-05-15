@@ -27,6 +27,7 @@ async def _run(app: QApplication) -> bool:
 
 def run() -> None:
     app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
     loop = qasync.QEventLoop(app)
     asyncio.set_event_loop(loop)
     with loop:
